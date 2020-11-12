@@ -3,8 +3,6 @@
 ## Authors: Nate Merrill, Sarina Atkinson (aka. Sarina Lyon) ##
 ## Contact: merrill.nathaniel@epa.gov ##
 
-rm(list=ls()) #clear all
-
 #load needed packages
 library(lubridate)
 library(ggplot2)
@@ -12,12 +10,12 @@ library(dplyr)
 library(stargazer)
 library(randomForest)
 library(Cairo)
+library(here)
 
 #####Load Data#####
 
 #set directory with input data#
 
-setwd("C:/Users/nmerri02/Desktop/GitHub/Rec_Demand/Cell data project") #change this as needed
 load("cellcalibration.RData") #adjust this if needed
 
 #fit stats function for comparing models
@@ -44,7 +42,7 @@ gansettfactor=.85
 all_ppltest$ppl[all_ppltest$source=="Narr"] <- all_ppltest$ppl[all_ppltest$source=="Narr"]*(1+gansettfactor)
 
 #plot season time series of observations of visitation for Narragansett Beach
-png(filename = "L:/Public/SHC 4.61/Economics/Cell data project/Manuscript/Figs and Tables/Narr Season Raw.png", #adjust this as needed
+png(filename = "Narr Season Raw.png", #adjust this as needed
     type="cairo", units = "in", width = 10, height = 6, pointsize = 16, res = 300)
 narr_plot <- ggplot(all_ppltest[all_ppltest$source=="Narr", ], aes(date2, ppl)) + geom_line(color="#3B9AB2", size=1) +
   labs(x="Date", y="Visits", title="Narragansett Beach Visitation for Summer 2017") + 
@@ -53,7 +51,7 @@ narr_plot
 dev.off()
 
 #cell to people scatter plots
-png(filename = "L:/Public/SHC 4.61/Economics/Cell data project/Manuscript/Figs and Tables/Raw scatter 2.png", 
+png(filename = "Raw scatter 2.png", 
     type="cairo", units = "in", width = 8, height = 6, pointsize = 16, res = 300)
 a <- ggplot(all_ppltest, aes(cell_9to3, ppl)) + 
   xlim(0, 20000) + ylim(0, 6000) + 
@@ -367,7 +365,7 @@ rf4p=rf4p$predictions
 ppl_comp$rf4p=rf4p
 
 #scatter plot
-png(filename = "L:/Public/SHC 4.61/Economics/Cell data project/Manuscript/Figs and Tables/Predicted scatter 2.png", 
+png(filename = "Predicted scatter 2.png", 
     type="cairo", units = "in", width = 8, height = 6, pointsize = 16, res = 300)
 rf4_plot <- ggplot(ppl_comp, aes(rf4p, ppl)) + 
   xlim(0, 6000) + ylim(0,6000) + 
@@ -415,7 +413,7 @@ forpredict$prediction=predict_rf1$predict.predictions
 forpredict$se=predict_rf1$predict.se
 
 #####save daily visitation predictions#####
-write.csv(forpredict, file="L:/Public/SHC 4.61/Economics/Cell data project/Manuscript/Figs and Tables/All Predictions_withpaper.csv")
+write.csv(forpredict, file="All Predictions_withpaper.csv")
 
 ####collapse by season and month#####
 #dont need this for paper but nice to have for other uses
@@ -439,7 +437,7 @@ narr <- narr[order(as.Date(narr$date2)), ]
 
 
 #with interval
-png(filename = "L:/Public/SHC 4.61/Economics/Cell data project/Manuscript/Figs and Tables/Narr Season CI 2.png", 
+png(filename = "Narr Season CI 2.png", 
     type="cairo", units = "in", width = 8, height = 6, pointsize = 16, res = 300)
 narr_ploti <- ggplot(narr, aes(date2, plus_se)) + 
   geom_line(color="#808080", size=0.5) +
@@ -451,7 +449,7 @@ narr_ploti + geom_line(aes(y=prediction), color="#3B9AB2", size=0.75)
 dev.off()
 
 #without interval and observed counts added as points
-png(filename = "L:/Public/SHC 4.61/Economics/Cell data project/Manuscript/Figs and Tables/Narr Season 3 with legend.png", 
+png(filename = "Narr Season 3 with legend.png", 
     type="cairo", units = "in", width = 8, height = 6, pointsize = 16, res = 300)
 cols <- c("Predicted Visits"="#3B9AB2", "Observed Visits"="#205562")
 narr_plot <- ggplot(narr, aes(x=date2)) + geom_line(aes(y=prediction,group=1, colour="Predicted Visits"), size=1) +
@@ -471,4 +469,4 @@ reg3ln =lm(ln_ppl~cell_9to3+Area_sq_m+source+jun+jul+aug+tue+wed+thu+fri+sat+sun
 reg4=lm(ppl~cell_9to3+Area_sq_m+source+jun+jul+aug+tue+wed+thu+fri+sat+sun+temp+precip,data=ppl_comp)
 reg4ln=lm(ln_ppl~cell_9to3+Area_sq_m+source+jun+jul+aug+tue+wed+thu+fri+sat+sun+temp+precip,data=ppl_comp)
 
-stargazer(reg1,reg1ln,reg4,reg4ln, type="html", out="L:/Public/SHC 4.61/Economics/Cell data project/Manuscript/Figs and Tables/regtable.html",ci.level=0.95,digits=3, digits.extra=1)
+stargazer(reg1,reg1ln,reg4,reg4ln, type="html", out="regtable.html",ci.level=0.95,digits=3, digits.extra=1)

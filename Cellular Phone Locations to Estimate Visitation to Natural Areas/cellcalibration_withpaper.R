@@ -14,8 +14,6 @@ library(here)
 
 #####Load Data#####
 
-#set directory with input data#
-
 load("cellcalibration.RData") #adjust this if needed
 
 #fit stats function for comparing models
